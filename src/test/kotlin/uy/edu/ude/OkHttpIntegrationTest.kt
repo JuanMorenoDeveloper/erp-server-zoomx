@@ -33,21 +33,6 @@ class OkHttpIntegrationTest {
 
   @Test
   @Throws(IOException::class)
-  fun givenAuthUser_whenGetGeneros_thenGetResponseOk() {
-    val client = OkHttpClient()
-    val request = Request.Builder()
-        .url("http://localhost:8080/genero")
-        .header("Authorization", Credentials.basic("user", "user"))
-        .build()
-
-    val response = client.newCall(request).execute()
-
-    assertThat(response.code).isEqualTo(200)
-    response.close()
-  }
-
-  @Test
-  @Throws(IOException::class)
   fun givenAuthUser_whenGetWrongUrl_thenGetResponse404() {
     val client = OkHttpClient()
     val request = Request.Builder()
@@ -63,10 +48,10 @@ class OkHttpIntegrationTest {
 
   @Test
   @Throws(IOException::class)
-  fun givenUnAuthUser_whenGetDepartamento_thenGetResponse401() {
+  fun givenUnAuthUser_whenGetSala_thenGetResponse401() {
     val client = OkHttpClient()
     val request = Request.Builder()
-        .url("http://localhost:8080/genero")
+        .url("http://localhost:8080/sala/1")
         .header("Authorization", Credentials.basic("bad", "wrong"))
         .build()
 
@@ -77,13 +62,21 @@ class OkHttpIntegrationTest {
 
   @Test
   @Throws(IOException::class)
-  fun givenUsuario_whenPostGenero_thenGetResponse403() {
+  fun givenUsuario_whenPostSala_thenGetResponse403() {
     val client = OkHttpClient()
     val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
-    val json = """{"nombre":"Prueba"}"""
+    val json = """
+      {
+        "nombre": "Sala Z",
+        "responsable": "Carlos C.",
+        "fechaDeReserva": "2020-11-21T11:00:00",
+        "tiempoReservaEnHoras": 2,
+        "icono": "https://cdn.pixabay.com/photo/2020/09/13/13/00/charles-bridge-5568178_960_720.jpg"
+      }
+    """
     val body = json.toRequestBody(JSON)
     val request = Request.Builder()
-        .url("http://localhost:8080/genero")
+        .url("http://localhost:8080/sala")
         .header("Authorization", Credentials.basic("user", "user"))
         .post(body).build()
 
@@ -94,20 +87,24 @@ class OkHttpIntegrationTest {
 
   @Test
   @Throws(IOException::class)
-  fun givenAdmin_whenPostPelicula_thenGetResponse201() {
+  fun givenAdmin_whenPostSala_thenGetResponse201() {
     val client = OkHttpClient()
     val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
     val json = """
-      {"director": "Carlos3000",
-      "titulo": "Test 123",
-      "fecha_estreno": "2019-12-12",
-      "poster": "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-      "genero":"http://localhost:8080/genero/2"}""".trimIndent()
+      {
+        "nombre": "Sala Z",
+        "responsable": "Carlos C.",
+        "fechaDeReserva": "2020-11-21T11:00:00",
+        "tiempoReservaEnHoras": 2,
+        "icono": "https://cdn.pixabay.com/photo/2020/09/13/13/00/charles-bridge-5568178_960_720.jpg"
+      }
+    """
     val body = json.toRequestBody(JSON)
     val request = Request.Builder()
-        .url("http://localhost:8080/pelicula")
+        .url("http://localhost:8080/sala")
         .header("Authorization", Credentials.basic("adm", "adm"))
         .post(body).build()
+
     val response = client.newCall(request).execute()
 
     assertThat(response.code).isEqualTo(201)
@@ -116,64 +113,76 @@ class OkHttpIntegrationTest {
 
   @Test
   @Throws(IOException::class)
-  fun givenAdmin_whenPostPeliculaWithInvalidFecha_thenGetResponse400() {
+  fun givenAdmin_whenSalaPeliculaWithInvalidFecha_thenGetResponse500() {
     val client = OkHttpClient()
     val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
     val json = """
-      {"director": "Carlos3000",
-      "titulo": "Test 123",
-      "fechaEstreno": "2019-12-100",
-      "poster": "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-      "genero":"http://localhost:8080/genero/2"}""".trimIndent()
+      {
+        "nombre": "Sala Z",
+        "responsable": "Carlos C.",
+        "fechaDeReserva": "2019-11-21T11:00:00",
+        "tiempoReservaEnHoras": 2,
+        "icono": "https://cdn.pixabay.com/photo/2020/09/13/13/00/charles-bridge-5568178_960_720.jpg"
+      }
+    """
     val body = json.toRequestBody(JSON)
     val request = Request.Builder()
-        .url("http://localhost:8080/pelicula")
+        .url("http://localhost:8080/sala")
         .header("Authorization", Credentials.basic("adm", "adm"))
         .post(body).build()
+
     val response = client.newCall(request).execute()
 
-    assertThat(response.code).isEqualTo(400)
+    assertThat(response.code).isEqualTo(500)
     response.close()
   }
 
   @Test
   @Throws(IOException::class)
-  fun givenAdm_whenPostEstudianteWithInvalidDirector_thenGetResponse500() {
+  fun givenAdm_whenPostSalaWithInvalidResponsable_thenGetResponse500() {
     val client = OkHttpClient()
     val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
     val json = """
-      {"director": null,
-      "titulo": "Test 123",
-      "fechaEstreno": "2019-12-10",
-      "poster": "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-      "genero":"http://localhost:8080/genero/2"}""".trimIndent()
+      {
+        "nombre": "Sala Z",
+        "responsable": null,
+        "fechaDeReserva": "2019-11-21T11:00:00",
+        "tiempoReservaEnHoras": 2,
+        "icono": "https://cdn.pixabay.com/photo/2020/09/13/13/00/charles-bridge-5568178_960_720.jpg"
+      }
+    """
     val body = json.toRequestBody(JSON)
     val request = Request.Builder()
-        .url("http://localhost:8080/pelicula")
+        .url("http://localhost:8080/sala")
         .header("Authorization", Credentials.basic("adm", "adm"))
         .post(body).build()
+
     val response = client.newCall(request).execute()
 
-    assertThat(response.code).isEqualTo(400)
+    assertThat(response.code).isEqualTo(500)
     response.close()
   }
 
   @Test
   @Throws(IOException::class)
-  fun givenAdmin_whenPutPelicula_thenGetResponse204() {
+  fun givenAdmin_whenPatchSala_thenGetResponse204() {
     val client = OkHttpClient()
     val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
     val json = """
-      {"director": "null",
-      "titulo": "Test 123",
-      "fechaEstreno": "2019-12-10",
-      "poster": "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-      "genero":"http://localhost:8080/genero/2"}""".trimIndent()
+      {
+        "nombre": "Sala 123",
+        "responsable": "Carlos C.",
+        "fechaDeReserva": "2020-11-20T10:00:00",
+        "tiempoReservaEnHoras": 2,
+        "icono": "https://cdn.pixabay.com/photo/2015/05/14/16/02/sandcastle-766949_960_720.jpg"
+      }
+    """
     val body = json.toRequestBody(JSON)
     val request = Request.Builder()
-        .url("http://localhost:8080/pelicula/1")
+        .url("http://localhost:8080/sala/1")
         .header("Authorization", Credentials.basic("adm", "adm"))
         .patch(body).build()
+
     val response = client.newCall(request).execute()
 
     assertThat(response.code).isEqualTo(204)
@@ -182,10 +191,10 @@ class OkHttpIntegrationTest {
 
   @Test
   @Throws(IOException::class)
-  fun givenAdmin_whenDeletePelicula_thenGetResponse204() {
+  fun givenAdmin_whenDeleteSala_thenGetResponse204() {
     val client = OkHttpClient()
     val request = Request.Builder()
-        .url("http://localhost:8080/pelicula/1")
+        .url("http://localhost:8080/sala/4")
         .header("Authorization", Credentials.basic("adm", "adm"))
         .delete().build()
 

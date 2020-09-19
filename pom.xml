@@ -25,10 +25,9 @@
     <java.version>1.8</java.version>
     <kotlin.version>1.4.10</kotlin.version>
     <okhttp.version>4.9.0</okhttp.version>
-	  <fabric8-maven-plugin.version>4.3.1</fabric8-maven-plugin.version>
     <spring-data-rest-hal-explorer.version>3.3.4.RELEASE</spring-data-rest-hal-explorer.version>
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-    <springdoc-openapi-data-rest.version>1.4.6</springdoc-openapi-data-rest.version>
+    <springdoc-openapi.version>1.4.6</springdoc-openapi.version>
   </properties>
 
   <dependencies>
@@ -55,7 +54,12 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-data-rest</artifactId>
-      <version>${springdoc-openapi-data-rest.version}</version>
+      <version>${springdoc-openapi.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-webmvc-core</artifactId>
+      <version>${springdoc-openapi.version}</version>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -77,10 +81,10 @@
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-stdlib-jdk8</artifactId>
     </dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-actuator</artifactId>
-	</dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>okhttp</artifactId>
@@ -159,28 +163,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-		<profile>
-			<id>openshift</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>io.fabric8</groupId>
-						<artifactId>fabric8-maven-plugin</artifactId>
-						<version>${fabric8-maven-plugin.version}</version>
-						<executions>
-							<execution>
-								<id>fmp</id>
-								<phase>package</phase>
-								<goals>
-									<goal>resource</goal>
-									<goal>build</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

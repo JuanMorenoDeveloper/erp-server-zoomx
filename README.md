@@ -9,10 +9,8 @@ El jar generado en la compilación queda con el nombre "erp-server-zoomx-0.0.1-S
 El puerto por default es 8080. Si se desea cambiar se puede usar la opción *--server.port=XXXX* para especificar el puerto de publicación de la aplicación. 
 
 ## Recursos disponibles
-**Películas**:   
-*URL*: http://localhost:8080/pelicula/   
-**Géneros**:   
-*URL*: http://localhost:8080/genero/
+**Salas**:   
+*URL*: http://localhost:8080/sala/
 **Usuario**:   
 *URL*: http://localhost:8080/usuario/
 
@@ -38,11 +36,8 @@ Con rol "**ROLE_ADMIN**":
 ## Seguridad y recursos
 El acceso a los recursos está protegido por autenticación HTTP Basic. Las URL y métodos permitidos por rol se describen a continuación:
 
-*URL*: /pelicula/**   
+*URL*: /sala/**   
 *Métodos HTTP permitidos*: POST(ROLE_ADMIN), DELETE(ROLE_ADMIN), PUT(ROLE_ADMIN), PATCH(ROLE_ADMIN), GET(ROLE_ADMIN, ROLE_USER)
-
-*URL*: /genero/**   
-*Métodos HTTP permitidos*: GET(ROLE_ADMIN, ROLE_USER)
 
 *URL*: /usuario/**   
 *Métodos HTTP permitidos*: GET(ROLE_ADMIN, ROLE_USER)  
@@ -52,24 +47,24 @@ El acceso a los recursos está protegido por autenticación HTTP Basic. Las URL 
 *Ejemplo de petición con rol ROLE_ADMIN*:
 
 ```kotlin
-  @Test
-  @Throws(IOException::class)
-  fun givenAuthUser_whenGetUsuario_thenGetResponseOk() {
-    val client = OkHttpClient()
-    val request = Request.Builder()
-        .url("http://localhost:8080/usuario")
-        .header("Authorization", Credentials.basic("adm", "adm"))
-        .build()
-    val rolExpected = "ROLE_ADMIN"
+@Test
+@Throws(IOException::class)
+fun givenAuthUser_whenGetUsuario_thenGetResponseOk() {
+  val client = OkHttpClient()
+  val request = Request.Builder()
+      .url("http://localhost:8080/usuario")
+      .header("Authorization", Credentials.basic("adm", "adm"))
+      .build()
+  val rolExpected = "ROLE_ADMIN"
 
-    val response = client.newCall(request).execute()
+  val response = client.newCall(request).execute()
 
-    assertSoftly {
-      it.assertThat(response.code).isEqualTo(200)
-      it.assertThat(response.body!!.string()).contains(rolExpected)
-    }
-    response.close()
+  assertSoftly {
+    it.assertThat(response.code).isEqualTo(200)
+    it.assertThat(response.body!!.string()).contains(rolExpected)
   }
+  response.close()
+}
 ```
 *Respuesta*:   
 Código HTTP: **200** OK   
@@ -95,27 +90,31 @@ Body (Objeto consultado):
 *Ejemplo de petición con rol ROLE_ADMIN*:   
 
 ```kotlin
-  @Test
-  @Throws(IOException::class)
-  fun givenAdmin_whenPostPelicula_thenGetResponse201() {
-    val client = OkHttpClient()
-    val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
-    val json = """
-      {"director": "Carlos3000",
-      "titulo": "Test 123",
-      "fecha_estreno": "2019-12-12",
-      "poster": "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-      "genero":"http://localhost:8080/genero/2"}""".trimIndent()
-    val body = json.toRequestBody(JSON)
-    val request = Request.Builder()
-        .url("http://localhost:8080/pelicula")
-        .header("Authorization", Credentials.basic("adm", "adm"))
-        .post(body).build()
-    val response = client.newCall(request).execute()
+@Test
+@Throws(IOException::class)
+fun givenAdmin_whenPostSala_thenGetResponse201() {
+  val client = OkHttpClient()
+  val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
+  val json = """
+    {
+      "nombre": "Sala Z",
+      "responsable": "Carlos C.",
+      "fechaDeReserva": "2020-11-21T11:00:00",
+      "tiempoReservaEnHoras": 2,
+      "icono": "https://cdn.pixabay.com/photo/2020/09/13/13/00/charles-bridge-5568178_960_720.jpg"
+    }
+  """
+  val body = json.toRequestBody(JSON)
+  val request = Request.Builder()
+      .url("http://localhost:8080/sala")
+      .header("Authorization", Credentials.basic("adm", "adm"))
+      .post(body).build()
 
-    assertThat(response.code).isEqualTo(201)
-    response.close()
-  }
+  val response = client.newCall(request).execute()
+
+  assertThat(response.code).isEqualTo(201)
+  response.close()
+}
 ```
 *Respuesta*:   
 Código HTTP: **201** Created   
@@ -123,24 +122,17 @@ Body (Objeto creado):
 
 ```json
 {
-  "titulo" : "Test 123",
-  "director" : "Carlos3000",
-  "fechaEstreno" : "2019-10-25",
-  "poster" : "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-  "_embedded" : {
-    "genero" : {
-      "nombre" : "Aventura"
-    }
-  },
-  "_links" : {
-    "self" : {
-      "href" : "http://localhost:8080/pelicula/4"
+  "nombre": "Sala Z",
+  "responsable": "Carlos C.",
+  "fechaDeReserva": "2020-11-21T11:00:00",
+  "tiempoReservaEnHoras": 2,
+  "icono": "https://cdn.pixabay.com/photo/2020/09/13/13/00/charles-bridge-5568178_960_720.jpg",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/sala/5"
     },
-    "pelicula" : {
-      "href" : "http://localhost:8080/pelicula/4"
-    },
-    "genero" : {
-      "href" : "http://localhost:8080/pelicula/4/genero"
+    "sala": {
+      "href": "http://localhost:8080/sala/5"
     }
   }
 }
@@ -150,53 +142,50 @@ Body (Objeto creado):
 *Ejemplo de petición con rol ROLE_ADMIN*:   
 
 ```kotlin
-  @Test
-  @Throws(IOException::class)
-  fun givenAdmin_whenPutPelicula_thenGetResponse204() {
-    val client = OkHttpClient()
-    val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
-    val json = """
-      {"director": "null",
-      "titulo": "Test 123",
-      "fechaEstreno": "2019-12-10",
-      "poster": "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-      "genero":"http://localhost:8080/genero/2"}""".trimIndent()
-    val body = json.toRequestBody(JSON)
-    val request = Request.Builder()
-        .url("http://localhost:8080/pelicula/1")
-        .header("Authorization", Credentials.basic("adm", "adm"))
-        .patch(body).build()
-    val response = client.newCall(request).execute()
+@Test
+@Throws(IOException::class)
+fun givenAdmin_whenPatchSala_thenGetResponse204() {
+  val client = OkHttpClient()
+  val JSON = "application/json; charset=utf-8".toMediaTypeOrNull()
+  val json = """
+    {
+      "nombre": "Sala 123",
+      "responsable": "Carlos C.",
+      "fechaDeReserva": "2020-11-20T10:00:00",
+      "tiempoReservaEnHoras": 2,
+      "icono": "https://cdn.pixabay.com/photo/2015/05/14/16/02/sandcastle-766949_960_720.jpg"
+    }
+  """
+  val body = json.toRequestBody(JSON)
+  val request = Request.Builder()
+      .url("http://localhost:8080/sala/1")
+      .header("Authorization", Credentials.basic("adm", "adm"))
+      .patch(body).build()
 
-    assertThat(response.code).isEqualTo(204)
-    response.close()
-  }
+  val response = client.newCall(request).execute()
+
+  assertThat(response.code).isEqualTo(204)
+  response.close()
+}
 ```
 
 *Respuesta*:   
-Código HTTP: **200** OK     
+Código HTTP: **204** OK     
 Body (Objeto actualizado):   
 
 ```json
 {
-  "titulo" : "Test 123",
-  "director" : "null",
-  "fechaEstreno" : "2019-12-10",
-  "poster" : "https://as.com/meristation/imagenes/2019/03/19/noticias/1553025770_364735_1553025920_sumario_normal2.jpg",
-  "_embedded" : {
-    "genero" : {
-      "nombre" : "Sci-Fi"
-    }
-  },
-  "_links" : {
-    "self" : {
-      "href" : "http://localhost:8080/pelicula/1"
+  "nombre": "Sala 123",
+  "responsable": "Carlos C.",
+  "fechaDeReserva": "2020-11-20T10:00:00",
+  "tiempoReservaEnHoras": 2,
+  "icono": "https://cdn.pixabay.com/photo/2015/05/14/16/02/sandcastle-766949_960_720.jpg",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/sala/1"
     },
-    "pelicula" : {
-      "href" : "http://localhost:8080/pelicula/1"
-    },
-    "genero" : {
-      "href" : "http://localhost:8080/pelicula/1/genero"
+    "sala": {
+      "href": "http://localhost:8080/sala/1"
     }
   }
 }
@@ -206,20 +195,20 @@ Body (Objeto actualizado):
 *Ejemplo de petición con usuario ROLE_ADMIN*:   
 
 ```kotlin
-  @Test
-  @Throws(IOException::class)
-  fun givenAdmin_whenDeletePelicula_thenGetResponse204() {
-    val client = OkHttpClient()
-    val request = Request.Builder()
-        .url("http://localhost:8080/pelicula/1")
-        .header("Authorization", Credentials.basic("adm", "adm"))
-        .delete().build()
+@Test
+@Throws(IOException::class)
+fun givenAdmin_whenDeleteSala_thenGetResponse204() {
+  val client = OkHttpClient()
+  val request = Request.Builder()
+      .url("http://localhost:8080/sala/4")
+      .header("Authorization", Credentials.basic("adm", "adm"))
+      .delete().build()
 
-    val response = client.newCall(request).execute()
+  val response = client.newCall(request).execute()
 
-    assertThat(response.code).isEqualTo(204)
-    response.close()
-  }
+  assertThat(response.code).isEqualTo(204)
+  response.close()
+}
 ```
 
 *Respuesta*:   
@@ -232,14 +221,14 @@ Body: Sin contenido
 **401** Unauthorized (Acceso denegado, contraseña incorrecta, rol sin privilegios)   
 
 ## Utilidades embebidas
-Una vez ejecutada la aplicación podra consultar las siguientes utilidades embebidas:   
+Una vez ejecutada la aplicación podrá consultar las siguientes utilidades embebidas:   
 1. **HAL Explorer**: Permite explorar los endpoint del servidor a través de navegación.  
 *URL Acceso*: [http://localhost:8080/explorer/index.html#/](http://localhost:8080/explorer/index.html#)
 Para acceder a los endpoints protegidos con HTTP Basic deberá agregar en los "Custom Request Headers" el valor:   
 Authorization: Basic YWRtaW46YWRtaW4=    
 Donde "YWRtaW46YWRtaW4="" es el Base64 de admin:admin.        
-![](HalBrowser.png)  
-Figura 1. Captura de Hal Browser
+![](HalExplorer.png)  
+Figura 1. Captura de Hal Explorer
    
 2. **H2 Console**: Consola para realizar consultas SQL y administrar la base de datos H2.   
 *URL Acceso*: [http://localhost:8080/h2-console/](http://localhost:8080/h2-console/)   
@@ -249,8 +238,6 @@ Figura 1. Captura de Hal Browser
 *User Name*: sa   
 *Password*:   
 
-3. http://localhost:8080/v3/api-docs
-
 ![](H2ConsoleLogin.png)
 
 Figura 2. Login H2 Console
@@ -259,6 +246,6 @@ Figura 2. Login H2 Console
 
 Figura 3. Manager H2 Console
 
-# Deploy en OCP
+3. **OpenAPI 3**: Contrato del servicio en formato OpenAPI 3 
 
-`$ mvn clean fabric8:deploy -Popenshift`
+*URL Acceso*: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)   
