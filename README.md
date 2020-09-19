@@ -227,8 +227,10 @@ Body: Sin contenido
 **401** Unauthorized (Acceso denegado, contraseña incorrecta, rol sin privilegios)   
 
 ## Utilidades embebidas
-Una vez ejecutada la aplicación podrá consultar las siguientes utilidades embebidas:   
-1. **HAL Explorer**: Permite explorar los endpoint del servidor a través de navegación.  
+Una vez ejecutada la aplicación podrá consultar las siguientes utilidades embebidas.
+
+### 1. HAL Explorer 
+Permite explorar los endpoint del servidor a través de navegación.  
 *URL Acceso*: [http://localhost:8080/explorer/index.html#/](http://localhost:8080/explorer/index.html#)
 Para acceder a los endpoints protegidos con HTTP Basic deberá agregar en los "Custom Request Headers" el valor:   
 Authorization: Basic YWRtaW46YWRtaW4=    
@@ -236,7 +238,9 @@ Donde "YWRtaW46YWRtaW4="" es el Base64 de admin:admin.
 ![](HalExplorer.png)  
 Figura 1. Captura de Hal Explorer
    
-2. **H2 Console**: Consola para realizar consultas SQL y administrar la base de datos H2.   
+### 2. H2 Console
+
+Consola para realizar consultas SQL y administrar la base de datos H2.   
 *URL Acceso*: [http://localhost:8080/h2-console/](http://localhost:8080/h2-console/)   
 **Parámetros de conexión:**   
 *Driver*: org.h2.Driver   
@@ -252,7 +256,9 @@ Figura 2. Login H2 Console
 
 Figura 3. Manager H2 Console
 
-3. **OpenAPI 3**: Contrato del servicio en formato OpenAPI 3 
+## 3. OpenAPI 3
+
+Contrato del servicio en formato OpenAPI 3 
 
 *URL Acceso*: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)   
 
