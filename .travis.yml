@@ -1,0 +1,8 @@
+language: java
+jdk: openjdk11
+cache:
+  directories:
+    - "$HOME/.m2"
+before_install: chmod +x mvnw
+install: ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+script: ./mvnw test -B
