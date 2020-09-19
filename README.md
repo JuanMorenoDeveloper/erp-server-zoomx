@@ -11,6 +11,12 @@ El puerto por default es 8080. Si se desea cambiar se puede usar la opción *--s
 ## Recursos disponibles
 **Salas**:   
 *URL*: http://localhost:8080/sala/
+
+**Búsqueda de salas**:
+* **Por fecha**: http://localhost:8080/sala/search/findAllByFechaDeReserva?fechaDeReserva={fechaDeReserva}
+* **Por nombre**: http://localhost:8080/sala/search/findAllByNombreContains?nombre={nombre}
+* **Por responsable**: http://localhost:8080/sala/search/findAllByResponsableContains?responsable={responsable}
+
 **Usuario**:   
 *URL*: http://localhost:8080/usuario/
 
