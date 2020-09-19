@@ -260,7 +260,7 @@ Figura 3. Manager H2 Console
 
 Contrato del servicio en formato OpenAPI 3 
 
-*URL Acceso*: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)   
+*URL Acceso*: [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs) 
 
 Con el contrato expuesto en la ruta (api-docs.json) se puede generar un cliente Kotlin, para ello se puede ir a [openapi-generator](https://github.com/OpenAPITools/openapi-generator) y seguir las instrucciones. 
 
